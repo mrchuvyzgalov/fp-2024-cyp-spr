@@ -4,12 +4,26 @@ import Control.Monad (unless)
 import Text.Printf (printf)
 
 ageOn :: String -> Float -> Float
-ageOn planet ageInSeconds =
-  undefined
+ageOn planet ageInSeconds = 
+  let earthYearInSeconds = 31557600 
+  in case planet of
+    "Mercury" -> ageInSeconds / (earthYearInSeconds * 0.2408467)
+    "Venus" -> ageInSeconds / (earthYearInSeconds * 0.61519726)
+    "Earth" -> ageInSeconds / earthYearInSeconds
+    "Mars" -> ageInSeconds / (earthYearInSeconds * 1.8808158)
+    "Jupiter" -> ageInSeconds / (earthYearInSeconds * 11.862615)
+    "Saturn" -> ageInSeconds / (earthYearInSeconds * 29.447498)
+    "Uranus" -> ageInSeconds / (earthYearInSeconds * 84.016846)
+    "Neptune" -> ageInSeconds / (earthYearInSeconds * 164.79132)
+    "Pluto" -> error "Pluto is not a planet"
 
 isLeapYear :: Int -> Bool
-isLeapYear year =
-  undefined
+isLeapYear year
+  | year < 0 = error "Year cannot be negative"
+  | mod year 400 == 0 = True
+  | mod year 100 == 0 = False
+  | mod year 4 == 0 = True
+  | otherwise = False
 
 main = do 
   runTests
