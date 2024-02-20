@@ -16,6 +16,7 @@ ageOn planet ageInSeconds =
     "Uranus" -> ageInSeconds / (earthYearInSeconds * 84.016846)
     "Neptune" -> ageInSeconds / (earthYearInSeconds * 164.79132)
     "Pluto" -> error "Pluto is not a planet"
+    _ -> error "There is no such planet"
 
 isLeapYear :: Int -> Bool
 isLeapYear year
