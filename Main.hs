@@ -6,17 +6,36 @@ import Text.Printf (printf)
 import Control.Monad (unless)
 import Data.List (sort)
 
+lessThen :: Int -> Int -> Bool
+lessThen border x = x < border
+
+notLessThen :: Int -> Int -> Bool
+notLessThen border x = x >= border
+
 quickSort :: [Int] -> [Int]
-quickSort = id 
+quickSort [] = []
+quickSort [x] = [x]
+quickSort (h : t) = let leftArr = filter (lessThen h) t
+                        rightsArr = filter (notLessThen h) (t ++ [h])
+                        leftSortedArr = quickSort leftArr
+                        rightSorderArr = quickSort rightsArr
+                    in leftSortedArr ++ rightSorderArr
 
 map' :: (a -> b) -> [a] -> [b]
-map' = undefined 
+map' transform xs = [transform x | x <- xs] 
 
 concatMap' :: (a -> [b]) -> [a] -> [b]
-concatMap' = undefined 
+concatMap' transform [] = []
+concatMap' transform (h : t) = transform h ++ concatMap' transform t
+
+positionsWithIdex :: Int -> (a -> Bool) -> [a] -> [Int]
+positionsWithIdex index predicate [] = []
+positionsWithIdex index predicate (h:t) 
+  | predicate h = index : positionsWithIdex (index + 1) predicate t
+  | otherwise = positionsWithIdex (index + 1) predicate t
 
 positions :: (a -> Bool) -> [a] -> [Int]
-positions = undefined 
+positions = positionsWithIdex 0
 
 main = do
   runTests
