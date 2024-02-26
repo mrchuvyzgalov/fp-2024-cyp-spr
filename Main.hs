@@ -24,34 +24,25 @@ data Expr
   = Number Double 
   | SquareRoot Expr
   | Operation BinOperator Expr Expr 
+  deriving (Eq)
 
 instance Show Expr where 
   show (Number x) = show x
   show (SquareRoot x) = "sqrt(" ++ show x ++ ")"
   show (Operation op x y) = "(" ++ show x ++ " " ++ show op ++ " " ++ show y ++ ")"
 
-instance Eq Expr where 
-  (==) (Number x) (Number y) = x == y 
-  (==) (SquareRoot x) (SquareRoot y) = x == y
-  (==) (Operation op x y) (Operation op' x' y') = op == op' && x == x' && y == y'
-  (==) _ _ = False
-
 data Error 
   = SquareRootError
   | DividingByZeroError
+  deriving (Eq)
 
 instance Show Error where 
   show SquareRootError = "You can't take the square root of a negative number"
   show DividingByZeroError = "You can't divide by zero"
 
-instance Eq Error where 
-  (==) SquareRootError SquareRootError = True
-  (==) DividingByZeroError DividingByZeroError = True
-  (==) _ _ = False 
-
 extractValues :: Either Error Double -> Either Error Double -> Either Error (Double, Double)
 extractValues (Right x) (Right y) = Right (x, y)
-extractValues (Left x) (Right y) = Left x
+extractValues (Left x) _ = Left x
 extractValues _ (Left y) = Left y
 
 takeOperation :: BinOperator -> Double -> Double -> Either Error Double
