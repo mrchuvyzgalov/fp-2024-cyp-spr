@@ -43,21 +43,20 @@ instance Functor (MyEither l) where
 -- 
 -- 3. 1 - PROVED, 2 - PROVED |-> Functor Either - PROVED
 
-data Arrow a b = To a b deriving (Eq)
+newtype Arrow a b = Arrow ((->) a b)
 
 instance Functor (Arrow a) where
-    fmap :: (b -> c) ->  Arrow a b -> Arrow a c
-    fmap f (To x y) = To x (f y)
+    fmap f (Arrow g) = Arrow (f . g)
 
 -- Proof
 -- 1. fmap id == id
---    a) fmap id (To x y) = To x (id y) = To x y
---    b) id (To x y) = To x y
+--    a) fmap id (Arrow g) = Arrow (id . g)
+--    b) id (Arrow g) = Arrow (id . g)
 --    c) (a) == (b) - PROVED
 --
 -- 2. fmap (f . g) == (fmap f) . (fmap g) 
---    a) fmap (f . g) (To x y) = To x (f . g y)
---    b) (fmap f) . (fmap g) (To x y) = (fmap f) . (fmap g (To x y)) = fmap f (To x (g y)) = To x (f (g y)) = To x (f . g y)
+--    a) fmap (f . g) (Arrow h) = Arrow ((f . g) . h) = Arrow (f . g . h)
+--    b) ((fmap f) . (fmap g)) (Arrow h) = fmap f (Arrow (g . h)) = Arrow (f . g . h)
 --    c) (a) == (b) - PROVED
 --
 -- 3. 1 - PROVED, 2 - PROVED |-> Functor Arrow - PROVED
@@ -99,13 +98,13 @@ instance Show a => Show (Expr a) where
 data Error 
   = SquareRootError
   | DividingByZeroError
-  | UnknownVariableError
+  | UnknownVariableError String
   deriving (Eq)
 
 instance Show Error where 
   show SquareRootError = "You can't take the square root of a negative number"
   show DividingByZeroError = "You can't divide by zero"
-  show UnknownVariableError = "A variable is unknown"
+  show (UnknownVariableError var) = "Variable " ++ show var ++ " is unknown"
 
 extractValues :: Either Error a -> Either Error a -> Either Error (a, a)
 extractValues (Right x) (Right y) = Right (x, y)
@@ -124,29 +123,23 @@ takeOperation Division x y
 findValue :: String -> [(String, a)] -> Maybe a
 findValue var [] = Nothing
 findValue var (h : t) 
-    | var == (getName h) = Just (getValue h)
+    | var == fst h = Just (snd h)
     | otherwise = findValue var t
-    where 
-        getName :: (String, a) -> String
-        getName (name, _) = name
 
-        getValue :: (String, a) -> a
-        getValue (_, value) = value
-
-eval :: (Floating a, Ord a) => (Expr a) -> [(String, a)] -> Either Error a
+eval :: (Floating a, Ord a) => Expr a -> [(String, a)] -> Either Error a
 eval (Var name) vars = 
   case findValue name vars of
     Just value -> Right value
-    Nothing -> Left UnknownVariableError
+    Nothing -> Left (UnknownVariableError name)
 eval (Number x) _ = Right x
 eval (SquareRoot x) vars = 
   case eval x vars of 
-    Left error -> Left error
     Right evaledX -> if evaledX < 0 then Left SquareRootError else Right $ sqrt evaledX
+    error -> error
 eval (Operation op x y) vars =
   case extractValues (eval x vars) (eval y vars) of
-    Left error -> Left error
     Right (evaledX, evaledY) -> takeOperation op evaledX evaledY
+    Left error -> Left error
 
 simplify :: (Num a, Ord a) => Expr a -> Expr a
 simplify (Operation Addition x (Number 0)) = simplify x
@@ -166,7 +159,7 @@ cases :: [(Expr Double, Either Error Double)]
 cases = [
   (Number 5, Right 5), 
   (Var "x", Right 5),
-  (Var "y", Left UnknownVariableError),
+  (Var "y", Left (UnknownVariableError "y")),
   (SquareRoot (Number 4), Right 2),
   (SquareRoot (Number (-2)), Left SquareRootError),
   (Operation Addition (Number 1) (Number 2), Right 3),
