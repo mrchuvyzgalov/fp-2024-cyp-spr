@@ -4,8 +4,9 @@
 {-# OPTIONS_GHC -Wno-unused-do-bind #-}
 module Parser where 
 
-import Data.Char ( isAlpha, isAlphaNum, isDigit, digitToInt )
+import Data.Char ( isAlpha, isAlphaNum, isDigit, digitToInt, isNumber )
 import Control.Applicative ( Alternative((<|>), empty, many) )
+import Expression ( Expr(..) )
 
 keywords :: [String]
 keywords = ["if", "then", "else"]
