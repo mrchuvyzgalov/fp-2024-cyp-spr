@@ -4,10 +4,12 @@ import Parser ( Parser(..), satisfy )
 import Expression ( Expr(..) )
 import Control.Applicative ( Alternative((<|>)) )
 import Data.Char ( isAlpha, isAlphaNum, isDigit, digitToInt )
-import Data.Maybe ( Maybe(..), isJust )
+import Data.Maybe ( Maybe(..), isJust, fromJust )
 import Data.List ( elem )
 import Safe ( headMay )
-import BinOperator ( BinOperator(..) )
+import BinOperator ( BinOperator(..), binOperatorMap )
+import Data.Map ( Map, member, lookup )
+import qualified Data.Map as Map
 
 parseNumber :: Parser (Expr Double)
 parseNumber = do
@@ -61,20 +63,18 @@ parseSquareRoot = do
     where
         operator = "sqrt"
 
+parseBinOperator :: Parser BinOperator
+parseBinOperator = do
+    binOp <- satisfy (`Map.member` binOperatorMap)
+    return $ fromJust $ Map.lookup binOp binOperatorMap
+
 parseBinOperation :: Parser (Expr Double)
 parseBinOperation = do
-    binOp <- satisfy (`elem` "+-*^/")
+    binOp <- parseBinOperator
     satisfy (== ' ')
     expr <- parseExpression
     satisfy (== ' ')
-    expr' <- parseExpression
-    case binOp of
-        '+' -> return (Operation Addition expr expr')
-        '-' -> return (Operation Subtraction expr expr')
-        '*' -> return (Operation Multiplication expr expr')
-        '/' -> return (Operation Division expr expr')
-        '^' -> return (Operation Exponentiation expr expr')
-
+    Operation binOp expr <$> parseExpression
 
 parseExpression :: Parser (Expr Double)
 parseExpression = parseNumber <|> parseVariable <|> parseSquareRoot <|> parseBinOperation

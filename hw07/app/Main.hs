@@ -5,6 +5,7 @@ import Parser ( runParser, parseInt )
 import Data.Maybe ( fromJust )
 import Data.Either ( rights )
 import Eval ( runEval, ExprState )
+import Text.Read ( readMaybe )
 
 main :: IO ()
 main = do
@@ -17,14 +18,13 @@ main = do
   where
     readEnv :: IO (ExprState Double)
     readEnv = do
-        putStrLn "Enter names of variables like this 'a b c d'"
-        varNames <- getLine
-        putStrLn "Enter values of variables like this '1 2 3 4'"
-        varValues <- getLine
-        let names = words varNames
-            values = map fromIntegral (rights $ map parseInt (words varValues))
-            in return $ zip names values 
-
+        putStrLn "Enter state as [(name, value)]"
+        stateStr <- getLine
+        case readMaybe stateStr of
+          Nothing -> do
+            putStrLn "State was not parsed"
+            readEnv
+          Just state -> return state
     evalParsedExpr expr = do
         env <- readEnv
         let evaledResult = runEval expr env

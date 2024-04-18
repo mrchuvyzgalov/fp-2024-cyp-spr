@@ -1,5 +1,8 @@
 module BinOperator where
 
+import Data.Map (Map)
+import qualified Data.Map as Map
+
 data BinOperator 
   = Addition
   | Subtraction 
@@ -14,3 +17,6 @@ instance Show BinOperator where
   show Multiplication = "*"
   show Division = "/"
   show Exponentiation = "^"
+
+binOperatorMap :: Map Char BinOperator
+binOperatorMap = Map.fromList [('+', Addition), ('-', Subtraction), ('*', Multiplication), ('/', Division), ('^', Exponentiation)]
