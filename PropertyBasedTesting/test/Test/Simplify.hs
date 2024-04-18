@@ -12,7 +12,7 @@ import Expression.Eval
 
 prop_simplifiedExprResultIsEqualToExprResult :: Property
 prop_simplifiedExprResultIsEqualToExprResult = property $ do
-  expr <- forAll $ genExpr maxValue
+  expr <- forAll $ genExpr genDouble maxValue
   exprState <- forAll $ genExprState maxValue
   assert ((runEval expr exprState) == (runEval (simplify expr) exprState))
   where

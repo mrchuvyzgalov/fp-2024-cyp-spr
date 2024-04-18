@@ -16,6 +16,12 @@ instance Num a => Num (Expr a) where
     (*) x y = Operation Multiplication x y
     fromInteger = Number . fromInteger
 
+instance Functor Expr where
+  fmap f (Number numb) = Number $ f numb
+  fmap f (SquareRoot expr) = SquareRoot $ fmap f expr
+  fmap f (Operation op expr expr') = Operation op (fmap f expr) (fmap f expr')
+  fmap _ (Var name) = Var name
+
 instance Show a => Show (Expr a) where 
   show (Number x) = show x
   show (SquareRoot x) = "sqrt(" ++ show x ++ ")"

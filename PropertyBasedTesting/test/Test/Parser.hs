@@ -9,16 +9,15 @@ import Test.Util
 import Data.Maybe
 
 import Parser.Parser
-import Expression.Expression
 import Parser.ExpressionParser
 import Expression.Expression
 
 
 prop_expressionIsParsedToTheSameExpression :: Property
 prop_expressionIsParsedToTheSameExpression = property $ do
-  expr <- forAll $ genExprInt maxValue
+  expr <- forAll (genExpr genInt maxValue)
   case runParser parseExpression (showExprInPrefixNotation expr) of
-    Just ("", expr') -> assert (expr == (doubleToIntExpr expr'))
+    Just ("", expr') -> assert (expr == fmap round expr')
     _ -> assert False
   where
     maxValue = 100

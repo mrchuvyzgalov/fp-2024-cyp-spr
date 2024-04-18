@@ -31,8 +31,8 @@ genExprState n = do
 genBinOp :: Gen BinOperator
 genBinOp = Gen.element [Addition, Subtraction, Multiplication, Division, Exponentiation]
 
-genExpr :: Int -> Gen (Expr Double)
-genExpr n =
+genExpr :: (Int -> Gen a) -> Int -> Gen (Expr a)
+genExpr genNumb n =
   Gen.recursive
     Gen.choice
     [
@@ -44,37 +44,10 @@ genExpr n =
       unOpGen
     ]
   where
-    numGen = Number <$> genDouble n
+    numGen = Number <$> genNumb n
     varGen = Var <$> genVarName
     binOpGen = do
       op <- genBinOp
-      Gen.subterm2 (genExpr n) (genExpr n) (Operation op)
+      Gen.subterm2 (genExpr genNumb n) (genExpr genNumb n) (Operation op)
     unOpGen = do
-      Gen.subterm (genExpr n) SquareRoot
-
-genExprInt :: Int -> Gen (Expr Int)
-genExprInt n =
-  Gen.recursive
-    Gen.choice
-    [
-      numGen,
-      varGen
-    ]
-    [
-      binOpGen,
-      unOpGen
-    ]
-  where
-    numGen = Number <$> genInt n
-    varGen = Var <$> genVarName
-    binOpGen = do
-      op <- genBinOp
-      Gen.subterm2 (genExprInt n) (genExprInt n) (Operation op)
-    unOpGen = do
-      Gen.subterm (genExprInt n) SquareRoot
-
-doubleToIntExpr :: Expr Double -> Expr Int 
-doubleToIntExpr (Number numb) = Number $ round numb
-doubleToIntExpr (SquareRoot expr) = SquareRoot $ doubleToIntExpr expr 
-doubleToIntExpr (Operation op expr expr') = Operation op (doubleToIntExpr expr) (doubleToIntExpr expr')
-doubleToIntExpr (Var name) = Var name
+      Gen.subterm (genExpr genNumb n) SquareRoot
