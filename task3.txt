@@ -1,0 +1,33 @@
+1) `Int` и `data Z = Z Int`
+
+    intToZ x = Z x
+
+    zToInt (Z x) = x
+
+2) `data Tree a = Leaf | Node (Tree a) a (Tree a)` и `data Expr a = Zero | Add (Expr a) (Expr a) a`
+
+    treeToExpr Left = Zero 
+    treeToExpr (Node t x t') = Add (treeToExpr t) (treeToExpr t') x
+
+    exprToTree Zero = Left 
+    exprToTree (Add e e' x) = Node (exprToTree e) x (exprToTree e')
+
+3) `data List a = Nil | Cons a (List a)` и `[]`
+
+    listToArr Nil = []
+    listToArr (Cons a l) = (a:) $ listToArr l  
+
+    arrToList [] = Nil 
+    arrToList (h:t) = Cons h $ arrToList t
+
+4) `Either a (Either b (c, d))` и `() -> Either a (Either b (c, d))`
+
+    eToFunc e = () -> e 
+
+    funcToE f = f ()
+
+5) `(a -> b, a -> c)` и `(() , a -> b, a -> c)`
+
+    pairToTriple (x, y)= ((), x, y) 
+
+    tripleToPair (_, x, y) = (x, y)

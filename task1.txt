@@ -1,0 +1,17 @@
+`[a -> b] -> a -> [b]`  
+foo fs x = map (\f -> f x) fs
+
+`(a -> b) -> Tree a -> [b]`, provided `data Tree a = Leaf | Node (Tree a) a (Tree a)` 
+foo f Leaf = []
+foo f (Node t a t') = (foo f t) ++ [(f a)] ++ (foo f t')
+
+`Ord a => [a] -> [a]`
+foo = Data.List.sort
+
+`(a -> b -> c) -> (a -> b) -> a -> c`
+foo f g x = f x (g x)
+
+`((a -> b) -> c -> d) -> (a -> c -> b) -> c -> d`
+foo f g x = let 
+    g' = flip g 
+    in f (g' x) x
