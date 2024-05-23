@@ -12,7 +12,21 @@ testTask5 = testGroup "TestTask5"
         testCase "show 0{4}" $ show (Numb Zero [0] 4) @?= "0{4}",
         testCase "11{2} == 3{10}" $ Numb Positive [1, 1] 2 == Numb Positive [3] 10 @?= True,
         testCase "11{2} < 4{10}" $ Numb Positive [1, 1] 2 < Numb Positive [4] 10 @?= True,
-        testCase "11{2} > 4{10}" $ Numb Positive [1, 1] 2 > Numb Positive [4] 10 @?= False
+        testCase "11{2} > 4{10}" $ Numb Positive [1, 1] 2 > Numb Positive [4] 10 @?= False,
+        testCase "abs 11(2)" $ abs (Numb Positive [1, 1] 2) @?= Numb Positive [1, 1] 2,
+        testCase "abs -11(2)" $ abs (Numb Negative [1, 1] 2) @?= Numb Positive [1, 1] 2,
+        testCase "abs 0(2)" $ abs (Numb Zero [0] 2) @?= Numb Zero [0] 2,
+        testCase "signum 11(4)" $ signum (Numb Positive [1, 1] 4) @?= Numb Positive [1] 4,
+        testCase "signum -11(4)" $ signum (Numb Negative [1, 1] 4) @?= Numb Negative [1] 4,
+        testCase "signum 0(4)" $ signum (Numb Zero [0] 4) @?= Numb Zero [0] 4,
+        testCase "fromInteger 25" $ fromInteger 25 @?= Numb Positive [5, 2] 10,
+        testCase "fromInteger -25" $ fromInteger (-25) @?= Numb Negative [5, 2] 10,
+        testCase "fromInteger 0" $ fromInteger 0 @?= Numb Zero [0] 10,
+        testCase "11{2} + 10{10}" $ Numb Positive [1, 1] 2 + Numb Positive [0, 1] 10 @?= Numb Positive [1, 0, 1, 1] 2,
+        testCase "11{2} * 10{10}" $ Numb Positive [1, 1] 2 * Numb Positive [0, 1] 10 @?= Numb Positive [0, 1, 1, 1, 1] 2,
+        testCase "negate 11{2}" $ negate (Numb Positive [1, 1] 2) @?= Numb Negative [1, 1] 2,
+        testCase "negate -11{2}" $ negate (Numb Negative [1, 1] 2) @?= Numb Positive [1, 1] 2,
+        testCase "negate 0{2}" $ negate (Numb Zero [0] 2) @?= Numb Zero [0] 2
     ]
 
 testTask6 :: TestTree
